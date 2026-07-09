@@ -1,3 +1,7 @@
+import csv
+import io
+
+
 files = [
     {"filename": "resume.pdf", "size_kb": 245, "modified": "2026-07-09 10:30"},
     {"filename": "notes.txt", "size_kb": 12, "modified": "2026-07-09 11:05"},
@@ -7,10 +11,19 @@ files = [
 
 
 def generate_file_report(files):
-    print("Filename,Extension,Size_KB,Last_Modified,Category")
-
     total_size = 0
     largest_file = None
+
+    csv_output = io.StringIO()
+    writer = csv.writer(csv_output)
+
+    writer.writerow([
+        "Filename",
+        "Extension",
+        "Size_KB",
+        "Last_Modified",
+        "Category"
+    ])
 
     for file in files:
         name = file["filename"]
@@ -29,18 +42,24 @@ def generate_file_report(files):
         else:
             category = "Other"
 
-        total_size = total_size + size
+        writer.writerow([
+            name,
+            extension,
+            size,
+            modified,
+            category
+        ])
+
+        total_size += size
 
         if largest_file is None or size > largest_file["size_kb"]:
             largest_file = file
 
-        print(f"{name},{extension},{size},{modified},{category}")
+    print("--- CSV Output ---")
+    print(csv_output.getvalue())
 
-    print("\n--- Summary ---")
+    print("--- Summary ---")
     print(f"Total Files: {len(files)}")
     print(f"Total Size: {total_size} KB")
     print(f"Largest File: {largest_file['filename']}")
     print(f"Largest File Size: {largest_file['size_kb']} KB")
-
-
-generate_file_report(files)
